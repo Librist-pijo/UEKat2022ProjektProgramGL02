@@ -1,3 +1,4 @@
+from pydoc import describe
 from marshmallow import Schema, fields
 # import datetime as dt
 # from dataclasses import dataclass
@@ -22,3 +23,8 @@ class ResponseSchema(Schema):
 
 class RequestSchema(Schema):
     api_type = fields.String(required=True, description="Post API")
+
+
+class FileUploadSchema(Schema):
+    file = fields.Raw(required=True,description='Upload file')
+

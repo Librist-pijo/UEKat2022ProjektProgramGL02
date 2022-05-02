@@ -17,12 +17,14 @@ app.config.update({
     'APISPEC_SWAGGER_URL': '/swagger/',  # URI to access API Doc JSON
     'APISPEC_SWAGGER_UI_URL': '/swagger-ui/'  # URI to access UI of API Doc
 })
+app.config['UPLOAD_FOLDER'] = 'UploadedFiles'
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 docs = FlaskApiSpec(app)
 
 api.add_resource(GADC.GenderAgeDetectionPhotoApi, '/GenderAgeDetectionPhoto')
-api.add_resource(GADC.GenderAgeDetectionVideoApi, '/GenderAgeDetectionVideo')
+# api.add_resource(GADC.GenderAgeDetectionVideoApi, '/GenderAgeDetectionVideo')
 docs.register(GADC.GenderAgeDetectionPhotoApi)
-docs.register(GADC.GenderAgeDetectionVideoApi)
+# docs.register(GADC.GenderAgeDetectionVideoApi)
 
 if __name__ == '__main__':
     app.run(debug=True)
