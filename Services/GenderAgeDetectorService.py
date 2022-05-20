@@ -56,6 +56,8 @@ def image_resize(image, width=None, height=None, inter=cv2.INTER_AREA):
     return resized
 
 
+SAVE_PATH = 'ProcessedFiles/'
+
 faceProto = "Services\\opencv_face_detector.pbtxt"
 faceModel = "Services\\opencv_face_detector_uint8.pb"
 ageProto = 'Services\\age_deploy.prototxt'
@@ -73,38 +75,32 @@ ageNet = cv2.dnn.readNet(ageModel, ageProto)
 genderNet = cv2.dnn.readNet(genderModel, genderProto)
 
 
-def detect(image):
-    video = cv2.VideoCapture(image if image else 0)
+def detect(path, image_name):
+    image = cv2.imread(path+image_name)
     padding = 20
-    while cv2.waitKey(1) < 0:
-        hasFrame, frame = video.read()
-        if not hasFrame:
-            cv2.waitKey()
-            break
+    resultImg, faceBoxes = highlightFace(faceNet, image)
+    if not faceBoxes:
+        return {"No face detected"}
 
-        resultImg, faceBoxes = highlightFace(faceNet, frame)
-        if not faceBoxes:
-            print("No face detected")
+    for faceBox in faceBoxes:
+        face = image[max(0, faceBox[1]-padding):
+                     min(faceBox[3]+padding, image.shape[0]-1), max(0, faceBox[0]-padding):min(faceBox[2]+padding, image.shape[1]-1)]
 
-        for faceBox in faceBoxes:
-            face = frame[max(0, faceBox[1]-padding):
-                         min(faceBox[3]+padding, frame.shape[0]-1), max(0, faceBox[0]-padding):min(faceBox[2]+padding, frame.shape[1]-1)]
-
-            blob = cv2.dnn.blobFromImage(
-                face, 1.0, (227, 227), MODEL_MEAN_VALUES, swapRB=False)
-            genderNet.setInput(blob)
-            genderPreds = genderNet.forward()
-            gender = genderList[genderPreds[0].argmax()]
-            ageNet.setInput(blob)
-            agePreds = ageNet.forward()
-            age = ageList[agePreds[0].argmax()]
-            # Resize image for better scaling scaling, 
-            # if resultImg.shape[0] > 900:
-            #     cv2.putText(resultImg, f'{gender}, {age}', (
-            #         faceBox[0], faceBox[1]-25), cv2.FONT_HERSHEY_SIMPLEX, 2.0, (0, 255, 255), 6, cv2.LINE_AA)
-            #     resultImg = image_resize(resultImg, height=900)
-            # else:
-            #     cv2.putText(resultImg, f'{gender}, {age}', (
-            #         faceBox[0], faceBox[1]-10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2, cv2.LINE_AA)
-            # cv2.imshow("Detecting age and gender", resultImg)
+        blob = cv2.dnn.blobFromImage(
+            face, 1.0, (227, 227), MODEL_MEAN_VALUES, swapRB=False)
+        genderNet.setInput(blob)
+        genderPreds = genderNet.forward()
+        gender = genderList[genderPreds[0].argmax()]
+        ageNet.setInput(blob)
+        agePreds = ageNet.forward()
+        age = ageList[agePreds[0].argmax()]
+        # Resize image for better scaling scaling,
+        if resultImg.shape[0] > 900:
+            cv2.putText(resultImg, f'{gender}, {age}', (
+                faceBox[0], faceBox[1]-25), cv2.FONT_HERSHEY_SIMPLEX, 2.0, (0, 255, 255), 6, cv2.LINE_AA)
+            resultImg = image_resize(resultImg, height=900)
+        else:
+            cv2.putText(resultImg, f'{gender}, {age}', (
+                faceBox[0], faceBox[1]-10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2, cv2.LINE_AA)
+    cv2.imwrite(SAVE_PATH+image_name, resultImg)
     return age, gender
