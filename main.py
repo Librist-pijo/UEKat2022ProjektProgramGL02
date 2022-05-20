@@ -1,4 +1,3 @@
-from imp import reload
 import uvicorn
 from fastapi import FastAPI
 from Controllers import PhotoController
