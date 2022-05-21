@@ -58,12 +58,12 @@ def image_resize(image, width=None, height=None, inter=cv2.INTER_AREA):
 
 SAVE_PATH = 'ProcessedFiles/'
 
-faceProto = "Services\\opencv_face_detector.pbtxt"
-faceModel = "Services\\opencv_face_detector_uint8.pb"
-ageProto = 'Services\\age_deploy.prototxt'
-ageModel = "Services\\age_net.caffemodel"
-genderProto = "Services\\gender_deploy.prototxt"
-genderModel = "Services\\gender_net.caffemodel"
+faceProto = "Services/opencv_face_detector.pbtxt"
+faceModel = "Services/opencv_face_detector_uint8.pb"
+ageProto = 'Services/age_deploy.prototxt'
+ageModel = "Services/age_net.caffemodel"
+genderProto = "Services/gender_deploy.prototxt"
+genderModel = "Services/gender_net.caffemodel"
 
 MODEL_MEAN_VALUES = (78.4263377603, 87.7689143744, 114.895847746)
 ageList = ['(0-2)', '(4-6)', '(8-12)', '(15-20)',
